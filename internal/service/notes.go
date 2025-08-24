@@ -32,7 +32,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	err = s.notesRepo.CreateNote(note.Title, note.Body)
+	err = s.notesRepo.CreateNote(note.User_id, note.Title, note.Body)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}

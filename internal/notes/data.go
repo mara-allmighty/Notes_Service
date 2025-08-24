@@ -14,10 +14,10 @@ func NewNotesRepo(db *sql.DB) *NotesRepo {
 }
 
 // Получить заметку по Id
-func (nDB *NotesRepo) GetNoteById(id int) (*Note, error) {
+func (nr *NotesRepo) GetNoteById(id int) (*Note, error) {
 	var note Note
 
-	err := nDB.db.QueryRow(`SELECT title, body, created_at FROM notes WHERE id = $1`, id).Scan(&note.Title, &note.Body, &note.Created_at)
+	err := nr.db.QueryRow(`SELECT user_id, title, body, created_at FROM notes WHERE id = $1`, id).Scan(&note.User_id, &note.Title, &note.Body, &note.Created_at)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +26,8 @@ func (nDB *NotesRepo) GetNoteById(id int) (*Note, error) {
 }
 
 // Создать новую заметку
-func (nDB *NotesRepo) CreateNote(title, body string) error {
-	_, err := nDB.db.Exec(`INSERT INTO notes (title, body) VALUES ($1, $2)`, title, body)
+func (nr *NotesRepo) CreateNote(user_id int, title, body string) error {
+	_, err := nr.db.Exec(`INSERT INTO notes (user_id, title, body) VALUES ($1, $2, $3)`, user_id, title, body)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -37,8 +37,8 @@ func (nDB *NotesRepo) CreateNote(title, body string) error {
 }
 
 // Обновить заметку по Id
-func (nDB *NotesRepo) UpdateNoteById(id int, newTitle, newBody string) error {
-	_, err := nDB.db.Exec(`UPDATE notes SET title = $1, body = $2 WHERE id = $3`, newTitle, newBody, id)
+func (nr *NotesRepo) UpdateNoteById(id int, newTitle, newBody string) error {
+	_, err := nr.db.Exec(`UPDATE notes SET title = $1, body = $2 WHERE id = $3`, newTitle, newBody, id)
 	if err != nil {
 		return err
 	}
@@ -47,8 +47,8 @@ func (nDB *NotesRepo) UpdateNoteById(id int, newTitle, newBody string) error {
 }
 
 // Удалить заметку по Id
-func (nDB *NotesRepo) DeleteNoteById(id int) error {
-	_, err := nDB.db.Exec(`DELETE FROM notes WHERE id = $1`, id)
+func (nr *NotesRepo) DeleteNoteById(id int) error {
+	_, err := nr.db.Exec(`DELETE FROM notes WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
