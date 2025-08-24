@@ -15,7 +15,7 @@ func (s *Service) GetNoteById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	note, err := s.notesDB.GetNoteById(id)
+	note, err := s.notesRepo.GetNoteById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
@@ -32,7 +32,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	err = s.notesDB.CreateNote(note.Title, note.Body)
+	err = s.notesRepo.CreateNote(note.Title, note.Body)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
@@ -53,7 +53,7 @@ func (s *Service) UpdateNoteById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	err = s.notesDB.UpdateNoteById(id, note.Title, note.Body)
+	err = s.notesRepo.UpdateNoteById(id, note.Title, note.Body)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
@@ -68,7 +68,7 @@ func (s *Service) DeleteNoteById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	err = s.notesDB.DeleteNoteById(id)
+	err = s.notesRepo.DeleteNoteById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}

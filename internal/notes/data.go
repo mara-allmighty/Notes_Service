@@ -5,16 +5,16 @@ import (
 	"fmt"
 )
 
-type NotesDB struct {
+type NotesRepo struct {
 	db *sql.DB
 }
 
-func NewNotesDB(db *sql.DB) *NotesDB {
-	return &NotesDB{db: db}
+func NewNotesRepo(db *sql.DB) *NotesRepo {
+	return &NotesRepo{db: db}
 }
 
 // Получить заметку по Id
-func (nDB *NotesDB) GetNoteById(id int) (*Note, error) {
+func (nDB *NotesRepo) GetNoteById(id int) (*Note, error) {
 	var note Note
 
 	err := nDB.db.QueryRow(`SELECT title, body, created_at FROM notes WHERE id = $1`, id).Scan(&note.Title, &note.Body, &note.Created_at)
@@ -26,7 +26,7 @@ func (nDB *NotesDB) GetNoteById(id int) (*Note, error) {
 }
 
 // Создать новую заметку
-func (nDB *NotesDB) CreateNote(title, body string) error {
+func (nDB *NotesRepo) CreateNote(title, body string) error {
 	_, err := nDB.db.Exec(`INSERT INTO notes (title, body) VALUES ($1, $2)`, title, body)
 	if err != nil {
 		fmt.Println(err)
@@ -37,7 +37,7 @@ func (nDB *NotesDB) CreateNote(title, body string) error {
 }
 
 // Обновить заметку по Id
-func (nDB *NotesDB) UpdateNoteById(id int, newTitle, newBody string) error {
+func (nDB *NotesRepo) UpdateNoteById(id int, newTitle, newBody string) error {
 	_, err := nDB.db.Exec(`UPDATE notes SET title = $1, body = $2 WHERE id = $3`, newTitle, newBody, id)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (nDB *NotesDB) UpdateNoteById(id int, newTitle, newBody string) error {
 }
 
 // Удалить заметку по Id
-func (nDB *NotesDB) DeleteNoteById(id int) error {
+func (nDB *NotesRepo) DeleteNoteById(id int) error {
 	_, err := nDB.db.Exec(`DELETE FROM notes WHERE id = $1`, id)
 	if err != nil {
 		return err
