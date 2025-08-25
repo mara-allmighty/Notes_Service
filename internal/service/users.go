@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,7 +21,10 @@ func (s *Service) SignUp(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "user already exist")
 	}
 
-	return c.JSON(http.StatusOK, "Ok")
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": fmt.Sprintf("user %s created successfully!", user.Email),
+		"info":    user,
+	})
 }
 
 // GET localhost:8000/login
@@ -48,5 +52,8 @@ func (s *Service) LogIn(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{"token": t})
+	return c.JSON(http.StatusOK, echo.Map{
+		"user":  user,
+		"token": t,
+	})
 }
