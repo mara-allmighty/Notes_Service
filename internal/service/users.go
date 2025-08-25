@@ -1,15 +1,17 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"notes_service/middlewares"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
-// POST localhost:8000/signup
+// POST /signup
 func (s *Service) SignUp(c echo.Context) error {
 	var user User
 
@@ -21,13 +23,18 @@ func (s *Service) SignUp(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "user already exist")
 	}
 
+	user.Id, err = s.usersRepo.GetUserId(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
+	}
+
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": fmt.Sprintf("user %s created successfully!", user.Email),
 		"info":    user,
 	})
 }
 
-// GET localhost:8000/login
+// GET /login
 func (s *Service) LogIn(c echo.Context) error {
 	var user User
 
@@ -38,9 +45,15 @@ func (s *Service) LogIn(c echo.Context) error {
 		return echo.ErrUnauthorized
 	}
 
-	claims := &JwtCustomClaims{ // Set custom claims
-		user.Email,
-		jwt.RegisteredClaims{
+	id, err := s.usersRepo.GetUserId(user.Email)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, errors.New("user not found"))
+	}
+	user.Id = id
+
+	claims := &middlewares.JwtCustomClaims{ // Set custom claims
+		User_id: user.Id,
+		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 2)),
 		},
 	}
@@ -55,16 +68,5 @@ func (s *Service) LogIn(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"user":  user,
 		"token": t,
-	})
-}
-
-func (s *Service) GetUserProfile(c echo.Context) error {
-	// Получаем токен из контекста
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(*JwtCustomClaims) // Преобразуем в ваш собственный тип
-	email := claims.Email
-
-	return c.JSON(http.StatusOK, map[string]string{
-		"email": email,
 	})
 }

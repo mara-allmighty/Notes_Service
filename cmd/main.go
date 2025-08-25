@@ -28,12 +28,11 @@ func main() {
 	api.Use(middlewares.AuthMiddleware()) // attach AuthMiddleware to routes
 
 	api.GET("/note/:id", svc.GetNoteById)
+	api.GET("/notes", svc.GetNotes)
 	api.POST("/note", svc.CreateNote)
 	api.PUT("/note/:id", svc.UpdateNoteById)
 	api.DELETE("/note/:id", svc.DeleteNoteById)
 
-	api.GET("/profile", svc.GetUserProfile)
-
-	// запускаем сервер, чтобы слушал 8000 порт
+	// http://localhost:8000
 	router.Logger.Fatal(router.Start(":8000"))
 }

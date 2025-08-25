@@ -9,14 +9,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// GET - localhost:8000/api/note/:id
+// GET - /api/note/:id
 func (s *Service) GetNoteById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	note, err := s.notesRepo.GetNoteById(id)
+	var user User
+	user.Id = s.usersRepo.GetCurrentUser(c)
+
+	note, err := s.notesRepo.GetNoteById(user.Id, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
@@ -24,8 +27,23 @@ func (s *Service) GetNoteById(c echo.Context) error {
 	return c.JSON(http.StatusOK, note)
 }
 
-// POST - localhost:8000/api/note
+// GET - /api/notes
+func (s *Service) GetNotes(c echo.Context) error {
+	var user User
+
+	user.Id = s.usersRepo.GetCurrentUser(c)
+
+	notes, err := s.notesRepo.GetNotes(user.Id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, errors.New("notes not found"))
+	}
+
+	return c.JSON(http.StatusOK, notes)
+}
+
+// POST - /api/note
 func (s *Service) CreateNote(c echo.Context) error {
+	var user User
 	var note Note
 
 	err := c.Bind(&note)
@@ -33,7 +51,9 @@ func (s *Service) CreateNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	err = s.notesRepo.CreateNote(note.User_id, note.Title, note.Body)
+	user.Id = s.usersRepo.GetCurrentUser(c)
+
+	err = s.notesRepo.CreateNote(user.Id, note.Title, note.Body)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
@@ -45,21 +65,26 @@ func (s *Service) CreateNote(c echo.Context) error {
 	})
 }
 
-// UPDATE - localhost:8000/api/note/:id
+// PUT - /api/note/:id
 func (s *Service) UpdateNoteById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
+	var user User
 	var note Note
+
 	err = c.Bind(&note)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	err = s.notesRepo.UpdateNoteById(id, note.Title, note.Body)
+	user.Id = s.usersRepo.GetCurrentUser(c)
+
+	err = s.notesRepo.UpdateNoteById(user.Id, id, note.Title, note.Body)
 	if err != nil {
+		fmt.Println(err)
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 
@@ -70,14 +95,17 @@ func (s *Service) UpdateNoteById(c echo.Context) error {
 	})
 }
 
-// DELETE - localhost:8000/api/note/:id
+// DELETE - /api/note/:id
 func (s *Service) DeleteNoteById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	err = s.notesRepo.DeleteNoteById(id)
+	var user User
+	user.Id = s.usersRepo.GetCurrentUser(c)
+
+	err = s.notesRepo.DeleteNoteById(user.Id, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}

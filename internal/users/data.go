@@ -3,7 +3,10 @@ package users
 import (
 	"database/sql"
 	"errors"
+	"notes_service/middlewares"
 
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,7 +18,7 @@ func NewUsersRepo(db *sql.DB) *UsersRepo {
 	return &UsersRepo{db: db}
 }
 
-// CREATE user
+// SignUp
 func (ur *UsersRepo) SignUp(email, password string) error {
 	var user User
 
@@ -35,9 +38,8 @@ func (ur *UsersRepo) SignUp(email, password string) error {
 	return nil
 }
 
-// GET JWT-token
+// LogIn || Получить токен
 func (ur *UsersRepo) IsUserAuthSuccessful(checkEmail, checkPswd string) bool {
-	// ~Log in
 	var user User
 
 	// достаем хеш пароля
@@ -50,7 +52,7 @@ func (ur *UsersRepo) IsUserAuthSuccessful(checkEmail, checkPswd string) bool {
 	return err == nil
 }
 
-// Хешировать -- protected method
+// Хеширует пароль [protected method].
 func (ur *UsersRepo) createUserHashedPswd(unhashed_pswd string) string {
 	var user User
 
@@ -60,4 +62,26 @@ func (ur *UsersRepo) createUserHashedPswd(unhashed_pswd string) string {
 	}
 	user.Password = string(byte_hashed_pswd)
 	return user.Password
+}
+
+// Возвращает идентификатор текущего пользователя. Обеспечивает доступ только к своим заметкам.
+func (ur *UsersRepo) GetCurrentUser(c echo.Context) int {
+	// Получаем токен из контекста
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*middlewares.JwtCustomClaims) // Преобразуем в собственный тип
+	user_id := claims.User_id
+
+	return user_id
+}
+
+// Только для получения user_id во время логина.
+func (ur *UsersRepo) GetUserId(email string) (int, error) {
+	var user User
+
+	err := ur.db.QueryRow(`SELECT id FROM users WHERE email = $1`, email).Scan(&user.Id)
+	if err != nil {
+		return -1, err
+	}
+
+	return user.Id, nil
 }
