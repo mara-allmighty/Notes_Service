@@ -57,3 +57,14 @@ func (s *Service) LogIn(c echo.Context) error {
 		"token": t,
 	})
 }
+
+func (s *Service) GetUserProfile(c echo.Context) error {
+	// Получаем токен из контекста
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(*JwtCustomClaims) // Преобразуем в ваш собственный тип
+	email := claims.Email
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"email": email,
+	})
+}

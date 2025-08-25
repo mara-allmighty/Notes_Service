@@ -24,13 +24,15 @@ func main() {
 	router.POST("/signup", svc.SignUp)
 
 	// -- Restricted routes --
-	r := router.Group("/api")
-	r.Use(middlewares.AuthMiddleware()) // attach AuthMiddleware to routes
+	api := router.Group("/api")
+	api.Use(middlewares.AuthMiddleware()) // attach AuthMiddleware to routes
 
-	r.GET("/note/:id", svc.GetNoteById)
-	r.POST("/note", svc.CreateNote)
-	r.PUT("/note/:id", svc.UpdateNoteById)
-	r.DELETE("/note/:id", svc.DeleteNoteById)
+	api.GET("/note/:id", svc.GetNoteById)
+	api.POST("/note", svc.CreateNote)
+	api.PUT("/note/:id", svc.UpdateNoteById)
+	api.DELETE("/note/:id", svc.DeleteNoteById)
+
+	api.GET("/profile", svc.GetUserProfile)
 
 	// запускаем сервер, чтобы слушал 8000 порт
 	router.Logger.Fatal(router.Start(":8000"))
