@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -37,7 +38,11 @@ func (s *Service) CreateNote(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 
-	return c.JSON(http.StatusOK, "OK")
+	// server response
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "note created successfully!",
+		"note":    note,
+	})
 }
 
 // UPDATE - localhost:8000/api/note/:id
@@ -58,7 +63,11 @@ func (s *Service) UpdateNoteById(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 
-	return c.JSON(http.StatusOK, "OK")
+	// server response
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": fmt.Sprintf("note with ID %d updated successfully!", id),
+		"note":    note,
+	})
 }
 
 // DELETE - localhost:8000/api/note/:id
@@ -73,5 +82,8 @@ func (s *Service) DeleteNoteById(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 
-	return c.JSON(http.StatusOK, "OK")
+	// server response
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": fmt.Sprintf("note with ID %d deleted successfully!", id),
+	})
 }
