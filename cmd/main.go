@@ -23,14 +23,11 @@ func main() {
 	router.GET("/login", svc.LogIn)
 	router.POST("/signup", svc.SignUp)
 
-	// -- Accessible routes --
-	a := router.Group("/api")
-	a.GET("/note/:id", svc.GetNoteById)
-
 	// -- Restricted routes --
 	r := router.Group("/api")
 	r.Use(middlewares.AuthMiddleware()) // attach AuthMiddleware to routes
 
+	r.GET("/note/:id", svc.GetNoteById)
 	r.POST("/note", svc.CreateNote)
 	r.PUT("/note/:id", svc.UpdateNoteById)
 	r.DELETE("/note/:id", svc.DeleteNoteById)
