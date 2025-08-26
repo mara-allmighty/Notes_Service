@@ -4,7 +4,7 @@ import (
 	jwttoken "notes_service/internal/jwt_token"
 	"notes_service/internal/middlewares"
 	"notes_service/internal/service"
-	"notes_service/logs"
+	"notes_service/pkg/logs"
 
 	"github.com/labstack/echo/v4"
 )
