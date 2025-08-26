@@ -61,7 +61,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 		s.logger.Error(err)
 		return c.JSON(http.StatusFailedDependency, errors.New("external api error"))
 	}
-	note.Title += fmt.Sprintf("\n~'%s' - %s", quoteData["quote"], quoteData["author"])
+	note.Body += fmt.Sprintf("; ~quote: '%s' - %s", quoteData["quote"], quoteData["author"])
 
 	user.Id = s.usersRepo.GetCurrentUser(c)
 
