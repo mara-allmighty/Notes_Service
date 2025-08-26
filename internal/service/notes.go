@@ -56,7 +56,11 @@ func (s *Service) CreateNote(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	quoteData := externalapi.GetQuote()
+	quoteData, err := externalapi.GetQuote()
+	if err != nil {
+		s.logger.Error(err)
+		return c.JSON(http.StatusFailedDependency, errors.New("external api error"))
+	}
 	note.Title += fmt.Sprintf("\n~'%s' - %s", quoteData["quote"], quoteData["author"])
 
 	user.Id = s.usersRepo.GetCurrentUser(c)
