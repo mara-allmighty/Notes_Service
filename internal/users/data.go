@@ -18,7 +18,7 @@ func NewUsersRepo(db *sql.DB) *UsersRepo {
 	return &UsersRepo{db: db}
 }
 
-// SignUp
+// Sign up
 func (ur *UsersRepo) SignUp(email, password string) error {
 	var user User
 
@@ -36,20 +36,6 @@ func (ur *UsersRepo) SignUp(email, password string) error {
 	}
 
 	return nil
-}
-
-// LogIn || Получить токен
-func (ur *UsersRepo) IsUserAuthSuccessful(checkEmail, checkPswd string) bool {
-	var user User
-
-	// достаем хеш пароля
-	err := ur.db.QueryRow(`SELECT hashed_password FROM users WHERE email = $1`, checkEmail).Scan(&user.Password)
-	if err != nil {
-		return false
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(checkPswd))
-	return err == nil
 }
 
 // Хеширует пароль [protected method].

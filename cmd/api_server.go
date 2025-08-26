@@ -1,6 +1,7 @@
 package main
 
 import (
+	jwttoken "notes_service/internal/jwt_token"
 	"notes_service/internal/service"
 	"notes_service/logs"
 	"notes_service/middlewares"
@@ -17,6 +18,7 @@ func NewAPIServer(addr string) *APIServer {
 }
 
 func (s *APIServer) Run() {
+	token := jwttoken.Token{}
 	logger := logs.NewLogger(false)
 
 	db, err := PostgresConnection()
@@ -24,12 +26,12 @@ func (s *APIServer) Run() {
 		logger.Fatal(err)
 	}
 
-	svc := service.NewService(db, logger)
+	svc := service.NewService(db, logger, token)
 
 	router := echo.New()
 
 	// Auth routes
-	router.GET("/login", svc.LogIn)
+	router.GET("/login", svc.GetToken)
 	router.POST("/signup", svc.SignUp)
 
 	// -- Restricted routes --
