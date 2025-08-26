@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	externalapi "notes_service/internal/external_api"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -54,6 +55,9 @@ func (s *Service) CreateNote(c echo.Context) error {
 		s.logger.Error(err)
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
+
+	quoteData := externalapi.GetQuote()
+	note.Title += fmt.Sprintf("\n~'%s' - %s", quoteData["quote"], quoteData["author"])
 
 	user.Id = s.usersRepo.GetCurrentUser(c)
 
