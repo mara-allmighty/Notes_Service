@@ -3,7 +3,7 @@ package users
 import (
 	"database/sql"
 	"errors"
-	"notes_service/middlewares"
+	"notes_service/internal/middlewares"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"

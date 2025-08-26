@@ -3,7 +3,7 @@ package jwttoken
 import (
 	"database/sql"
 	"errors"
-	"notes_service/middlewares"
+	"notes_service/internal/middlewares"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
