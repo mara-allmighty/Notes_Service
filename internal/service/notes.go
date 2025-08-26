@@ -13,6 +13,7 @@ import (
 func (s *Service) GetNoteById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
@@ -21,6 +22,7 @@ func (s *Service) GetNoteById(c echo.Context) error {
 
 	note, err := s.notesRepo.GetNoteById(user.Id, id)
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 
@@ -35,6 +37,7 @@ func (s *Service) GetNotes(c echo.Context) error {
 
 	notes, err := s.notesRepo.GetNotes(user.Id)
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusInternalServerError, errors.New("notes not found"))
 	}
 
@@ -48,6 +51,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 
 	err := c.Bind(&note)
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
@@ -55,6 +59,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 
 	err = s.notesRepo.CreateNote(user.Id, note.Title, note.Body)
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 
@@ -69,6 +74,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 func (s *Service) UpdateNoteById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
@@ -77,6 +83,7 @@ func (s *Service) UpdateNoteById(c echo.Context) error {
 
 	err = c.Bind(&note)
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
@@ -84,7 +91,7 @@ func (s *Service) UpdateNoteById(c echo.Context) error {
 
 	err = s.notesRepo.UpdateNoteById(user.Id, id, note.Title, note.Body)
 	if err != nil {
-		fmt.Println(err)
+		s.logger.Error(err)
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 
@@ -99,6 +106,7 @@ func (s *Service) UpdateNoteById(c echo.Context) error {
 func (s *Service) DeleteNoteById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
@@ -107,6 +115,7 @@ func (s *Service) DeleteNoteById(c echo.Context) error {
 
 	err = s.notesRepo.DeleteNoteById(user.Id, id)
 	if err != nil {
+		s.logger.Error(err)
 		return c.JSON(http.StatusInternalServerError, errors.New("internal server error"))
 	}
 

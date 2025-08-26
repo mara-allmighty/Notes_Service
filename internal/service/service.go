@@ -4,18 +4,22 @@ import (
 	"database/sql"
 	"notes_service/internal/notes"
 	"notes_service/internal/users"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Service struct {
-	db *sql.DB
+	db     *sql.DB
+	logger echo.Logger
 
 	notesRepo *notes.NotesRepo
 	usersRepo *users.UsersRepo
 }
 
-func NewService(db *sql.DB) *Service {
+func NewService(db *sql.DB, logger echo.Logger) *Service {
 	svc := &Service{
-		db: db,
+		db:     db,
+		logger: logger,
 	}
 	svc.initRepos(db)
 	return svc

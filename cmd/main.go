@@ -1,21 +1,24 @@
 package main
 
 import (
-	"log"
 	"notes_service/internal/service"
+	"notes_service/logs"
 	"notes_service/middlewares"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
+	// создаем логгер
+	logger := logs.NewLogger(false)
+
 	// подключаемся к базе
 	db, err := PostgresConnection()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
-	svc := service.NewService(db)
+	svc := service.NewService(db, logger)
 
 	router := echo.New()
 
