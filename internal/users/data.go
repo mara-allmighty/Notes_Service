@@ -60,7 +60,7 @@ func (ur *UsersRepo) GetCurrentUser(c echo.Context) int {
 	return user_id
 }
 
-// Только для получения user_id во время логина.
+// Только для получения user_id во время логина, так как из токена айдишник получить нельзя по его отсутствию.
 func (ur *UsersRepo) GetUserId(email string) (int, error) {
 	var user User
 
