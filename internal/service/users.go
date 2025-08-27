@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// POST /signup
+// Sign up
 func (s *Service) SignUp(c echo.Context) error {
 	var user User
 
