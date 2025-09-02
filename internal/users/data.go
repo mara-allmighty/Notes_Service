@@ -33,14 +33,14 @@ func (ur *UsersRepo) SignUp(email, password string) error {
 }
 
 // Хеширует пароль [protected method].
-func (ur *UsersRepo) createUserHashedPswd(unhashed_pswd string) string {
+func (ur *UsersRepo) createUserHashedPswd(unhashedPassword string) string {
 	var user User
 
-	byte_hashed_pswd, err := bcrypt.GenerateFromPassword([]byte(unhashed_pswd), bcrypt.DefaultCost)
+	byteHashedPassword, err := bcrypt.GenerateFromPassword([]byte(unhashedPassword), bcrypt.DefaultCost)
 	if err != nil {
 		return ""
 	}
-	user.Password = string(byte_hashed_pswd)
+	user.Password = string(byteHashedPassword)
 	return user.Password
 }
 
