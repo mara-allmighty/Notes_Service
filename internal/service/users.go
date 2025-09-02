@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"notes_service/internal/middlewares"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -66,7 +65,7 @@ func (s *Service) LogIn(c echo.Context) error {
 func (s *Service) GetCurrentUserId(c echo.Context) int {
 	user := c.Get("user").(*jwt.Token)
 
-	claims := user.Claims.(*middlewares.JwtCustomClaims)
+	claims := user.Claims.(*JwtCustomClaims)
 	user_id := claims.User_id
 
 	return user_id
@@ -80,7 +79,7 @@ func (s *Service) createToken(user User) (string, error) {
 	}
 	user.Id = id
 
-	claims := &middlewares.JwtCustomClaims{
+	claims := &JwtCustomClaims{
 		User_id: user.Id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 2)),

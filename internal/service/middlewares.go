@@ -1,4 +1,4 @@
-package middlewares
+package service
 
 import (
 	"github.com/golang-jwt/jwt/v5"
@@ -6,8 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Middleware для проверки токена
 func AuthMiddleware() echo.MiddlewareFunc {
-	// configure middleware with the custom claims type
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims { return new(JwtCustomClaims) },
 		SigningKey:    []byte("secret"),

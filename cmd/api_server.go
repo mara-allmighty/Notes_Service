@@ -1,8 +1,8 @@
 package main
 
 import (
-	"notes_service/internal/middlewares"
 	"notes_service/internal/service"
+	"notes_service/internal/service/middlewares"
 	"notes_service/pkg/logs"
 
 	"github.com/labstack/echo/v4"
