@@ -2,10 +2,7 @@ package users
 
 import (
 	"database/sql"
-	"notes_service/internal/middlewares"
 
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -32,7 +29,20 @@ func (ur *UsersRepo) SignUp(email, password string) error {
 	return nil
 }
 
-// Хеширует пароль [protected method].
+// Log in
+func (ur *UsersRepo) LogIn(checkEmail, checkPswd string) bool {
+	var userPassword string
+
+	err := ur.db.QueryRow(`SELECT hashed_password FROM users WHERE email = $1`, checkEmail).Scan(&userPassword)
+	if err != nil {
+		return false
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(checkPswd))
+	return err == nil
+}
+
+// Хеширует пароль
 func (ur *UsersRepo) createUserHashedPswd(unhashedPassword string) string {
 	var user User
 
@@ -44,17 +54,7 @@ func (ur *UsersRepo) createUserHashedPswd(unhashedPassword string) string {
 	return user.Password
 }
 
-// Возвращает идентификатор текущего пользователя. Обеспечивает доступ только к своим заметкам.
-func (ur *UsersRepo) GetCurrentUser(c echo.Context) int {
-	// Получаем токен из контекста
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(*middlewares.JwtCustomClaims) // Преобразуем в собственный тип
-	user_id := claims.User_id
-
-	return user_id
-}
-
-// Только для получения user_id во время логина, так как из токена айдишник получить нельзя по его отсутствию.
+// Для получения user_id во время логина, т.к. из токена Id получить нельзя из-за отсутствия токена
 func (ur *UsersRepo) GetUserId(email string) (int, error) {
 	var user User
 

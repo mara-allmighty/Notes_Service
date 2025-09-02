@@ -19,7 +19,7 @@ func (s *Service) GetNoteById(c echo.Context) error {
 	}
 
 	var user User
-	user.Id = s.usersRepo.GetCurrentUser(c)
+	user.Id = s.GetCurrentUserId(c)
 
 	note, err := s.notesRepo.GetNoteById(user.Id, id)
 	if err != nil {
@@ -34,7 +34,7 @@ func (s *Service) GetNoteById(c echo.Context) error {
 func (s *Service) GetNotes(c echo.Context) error {
 	var user User
 
-	user.Id = s.usersRepo.GetCurrentUser(c)
+	user.Id = s.GetCurrentUserId(c)
 
 	notes, err := s.notesRepo.GetNotes(user.Id)
 	if err != nil {
@@ -63,7 +63,7 @@ func (s *Service) CreateNote(c echo.Context) error {
 	}
 	note.Body += fmt.Sprintf("; ~quote: '%s' - %s", quoteData["quote"], quoteData["author"])
 
-	user.Id = s.usersRepo.GetCurrentUser(c)
+	user.Id = s.GetCurrentUserId(c)
 
 	err = s.notesRepo.CreateNote(user.Id, note.Title, note.Body)
 	if err != nil {
@@ -95,7 +95,7 @@ func (s *Service) UpdateNoteById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errors.New("invalid params"))
 	}
 
-	user.Id = s.usersRepo.GetCurrentUser(c)
+	user.Id = s.GetCurrentUserId(c)
 
 	err = s.notesRepo.UpdateNoteById(user.Id, id, note.Title, note.Body)
 	if err != nil {
@@ -119,7 +119,7 @@ func (s *Service) DeleteNoteById(c echo.Context) error {
 	}
 
 	var user User
-	user.Id = s.usersRepo.GetCurrentUser(c)
+	user.Id = s.GetCurrentUserId(c)
 
 	err = s.notesRepo.DeleteNoteById(user.Id, id)
 	if err != nil {
