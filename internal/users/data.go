@@ -2,7 +2,6 @@ package users
 
 import (
 	"database/sql"
-	"errors"
 	"notes_service/internal/middlewares"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -22,15 +21,10 @@ func NewUsersRepo(db *sql.DB) *UsersRepo {
 func (ur *UsersRepo) SignUp(email, password string) error {
 	var user User
 
-	err := ur.db.QueryRow(`SELECT email FROM users WHERE email = $1`, email).Scan(&user.Email)
-	if err == nil {
-		return errors.New("user already exist")
-	}
-
 	user.Email = email
 	user.Password = ur.createUserHashedPswd(password)
 
-	_, err = ur.db.Exec(`INSERT INTO users (email, hashed_password) VALUES ($1, $2)`, user.Email, user.Password)
+	_, err := ur.db.Exec(`INSERT INTO users (email, hashed_password) VALUES ($1, $2)`, user.Email, user.Password)
 	if err != nil {
 		return err
 	}
