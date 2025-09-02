@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	externalapi "notes_service/internal/external_api"
+	externalapi "notes_service/internal/service/external_api"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
