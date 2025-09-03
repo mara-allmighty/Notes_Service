@@ -42,22 +42,38 @@ func (s *Service) LogIn(c echo.Context) error {
 	user.Email = c.FormValue("email")
 	user.Password = c.FormValue("password")
 
-	// валидация User-а
+	// валидация входных данных
 	if ok := s.usersRepo.LogIn(user.Email, user.Password); !ok {
 		s.logger.Error("unauthorized: wrong email or password")
 		return echo.ErrUnauthorized
 	}
 
-	// создаем jwt-token
-	token, err := s.createToken(user)
+	// создание jwt-токена
+	id, err := s.usersRepo.GetUserId(user.Email)
 	if err != nil {
 		s.logger.Error(err)
-		return c.JSON(http.StatusInternalServerError, errors.New("token create error"))
+		return "", err
+	}
+	user.Id = id
+	
+	claims := &JwtCustomClaims{
+		User_id: user.Id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 2)),
+		},
+	}
+	
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	
+	encodedToken, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return "", errors.New("error occured while encode the token")
 	}
 
+	// response
 	return c.JSON(http.StatusOK, echo.Map{
 		"user":  user,
-		"token": token,
+		"token": encodedToken,
 	})
 }
 
@@ -69,29 +85,4 @@ func (s *Service) GetCurrentUserId(c echo.Context) int {
 	user_id := claims.User_id
 
 	return user_id
-}
-
-func (s *Service) createToken(user User) (string, error) {
-	id, err := s.usersRepo.GetUserId(user.Email)
-	if err != nil {
-		s.logger.Error(err)
-		return "", err
-	}
-	user.Id = id
-
-	claims := &JwtCustomClaims{
-		User_id: user.Id,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 2)),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	encodedToken, err := token.SignedString([]byte("secret"))
-	if err != nil {
-		return "", errors.New("error occured while encode the token")
-	}
-
-	return encodedToken, nil
 }
